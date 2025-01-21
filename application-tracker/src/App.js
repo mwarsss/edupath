@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
   return (
@@ -13,7 +14,7 @@ const App = () => {
         <div className="container mt-4">
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
             <Route path="/" element={<h1>Welcome to Application Tracker</h1>} />
           </Routes>
         </div>

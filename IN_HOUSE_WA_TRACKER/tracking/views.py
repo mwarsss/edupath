@@ -86,3 +86,27 @@ class RegisterView(APIView):
             return Response({"message": "User registered successfully."}, status=HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+
+
+class UpdateApplicationStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, application_id):
+        # Ensure only staff can update statuses
+        if not request.user.is_staff:
+            return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+
+        # Retrieve the application
+        try:
+            application = Application.objects.get(id=application_id)
+        except Application.DoesNotExist:
+            return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Update the status
+        new_status = request.data.get("status")
+        if new_status:
+            application.status = new_status
+            application.save()
+            return Response({"message": "Status updated successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Status is required"}, status=status.HTTP_400_BAD_REQUEST)
