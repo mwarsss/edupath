@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +9,7 @@ from .models import Student, Staff, Application, Notification
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -24,6 +25,10 @@ class StaffViewSet(viewsets.ModelViewSet):
 class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['status']  # Add fields you want to filter by
+    # Add fields you want to search by
+    search_fields = ['status', 'student__name']
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

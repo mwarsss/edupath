@@ -6,6 +6,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isStaff, setIsStaff] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -13,6 +15,10 @@ const Dashboard = () => {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://127.0.0.1:8000/api/applications/", {
           headers: { Authorization: `Bearer ${token}` },
+          params: {
+            search: search,
+            status: statusFilter,
+          },
         });
         setApplications(response.data.applications || []);
         setIsStaff(response.data.is_staff); // Assuming the backend sends `is_staff`
@@ -24,7 +30,7 @@ const Dashboard = () => {
     };
 
     fetchApplications();
-  }, []);
+  }, [search, statusFilter]);
 
   const updateStatus = async (id, status) => {
     try {
@@ -52,11 +58,26 @@ const Dashboard = () => {
 
   return (
     <div className="container mt-4">
-      {isStaff ? (
-        <h2 className="mb-4">Welcome, Staff! Here's the list of all applications</h2>
-      ) : (
-        <h2 className="mb-4">Welcome! Here are your applications:</h2>
-      )}
+      <h2 className="mb-4">Dashboard</h2>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search applications"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="form-control mb-2"
+        />
+        <select
+          className="form-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
       <table className="table table-bordered">
         <thead>
           <tr>

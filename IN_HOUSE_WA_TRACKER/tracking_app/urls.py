@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from tracking.views import StudentViewSet, StaffViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, RegisterView, UpdateApplicationStatusView
+from tracking.views import StudentViewSet, StaffViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView
 
 
 router = DefaultRouter()
