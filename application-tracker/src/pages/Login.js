@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -13,19 +13,25 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/api/login", {
-                email,
+            const response = await axios.post("http://127.0.0.1:8000/api/login/", {
+                username,
                 password,
             });
 
-            //Save token and role in local storage
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("role", response.data.role);
+            // Save token and role in local storage
+            localStorage.setItem("token", response.data.access);
+            localStorage.setItem("refresh", response.data.refresh);
+            localStorage.setItem("username", response.data.username);
 
-            //Redirect to dashboard
+            // Redirect to dashboard
             navigate("/dashboard");
         } catch (error) {
-            setError("Invalid credentials");
+            console.error("Login error:", error);
+            if (error.response && error.response.data) {
+                setError(error.response.data.error || "Invalid credentials");
+            } else {
+                setError("An error occurred. Please try again.");
+            }
         }
     };
 
@@ -34,15 +40,15 @@ const Login = () => {
             <h2 className="text-center">Login</h2>
             <form onSubmit={handleLogin} className="mt-4">
                 <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                        Email Address
+                    <label htmlFor="username" className="form-label">
+                        Username
                     </label>
                     <input
-                        type="email"
-                        id="email"
+                        type="text"
+                        id="username"
                         className="form-control"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
                 </div>
