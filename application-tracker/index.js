@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard"
+import { reportWebVitals } from './reportWebVitals';
 
 const App = () => (
     <Router>
@@ -14,3 +15,4 @@ const App = () => (
 
 export default App;
 
+reportWebVitals();
