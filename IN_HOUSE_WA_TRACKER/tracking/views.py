@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Student, Staff, Application, Notification
 from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
+from rest_framework_simplejwt.authentication import TokenObtainPairView
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -22,3 +23,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
+
+
+class LoginView(TokenObtainPairView):
+    pass
