@@ -30,6 +30,7 @@ router.register('applications', ApplicationViewSet)
 router.register('notifications', NotificationViewSet)
 
 urlpatterns = [
-    path('api/login/', LoginView.as_view(), name='login'),
-    path('api/applications', ApplicationListView.as_view(), name='applications'),
-    router.urls]
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('api/applications/', ApplicationListView.as_view(), name='applications'),
+]
