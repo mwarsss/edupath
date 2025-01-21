@@ -14,7 +14,7 @@ const Dashboard = () => {
         const response = await axios.get("http://127.0.0.1:8000/api/applications/", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setApplications(response.data.applications);
+        setApplications(response.data.applications || []);
         setIsStaff(response.data.is_staff); // Assuming the backend sends `is_staff`
         setLoading(false);
       } catch (err) {
@@ -26,8 +26,29 @@ const Dashboard = () => {
     fetchApplications();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  const updateStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.patch(`http://127.0.0.1:8000/api/applications/${id}/`, { status }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setApplications((prevApplications) =>
+        prevApplications.map((app) =>
+          app.id === id ? { ...app, status } : app
+        )
+      );
+    } catch (err) {
+      setError("Failed to update status.");
+    }
+  };
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
+  if (error) {
+    return <h2 className="text-danger">{error}</h2>;
+  }
 
   return (
     <div className="container mt-4">
@@ -46,16 +67,37 @@ const Dashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {applications.map((app) => (
-            <tr key={app.id}>
-              <td>{app.id}</td>
-              <td>{app.student.name}</td>
-              <td>{app.status}</td>
-              <td>
-                <button className="btn btn-sm btn-primary">View</button>
-              </td>
+          {applications.length > 0 ? (
+            applications.map((app) => (
+              <tr key={app.id}>
+                <td>{app.id}</td>
+                <td>{app.student.name}</td>
+                <td>
+                  {app.status}
+                  {isStaff && (
+                    <select
+                      className="form-select form-select-sm"
+                      onChange={(e) => updateStatus(app.id, e.target.value)}
+                    >
+                      <option disabled selected>
+                        Update Status
+                      </option>
+                      <option value="Pending">Pending</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  )}
+                </td>
+                <td>
+                  <button className="btn btn-sm btn-primary">View</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">No applications found.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

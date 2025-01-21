@@ -13,8 +13,11 @@ const App = () => {
         <Navbar />
         <div className="container mt-4">
           <Routes>
+             {/* Public Route */}
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+
+            {/* Private Route */}
+            <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
             <Route path="/" element={<h1>Welcome to Application Tracker</h1>} />
           </Routes>
         </div>
