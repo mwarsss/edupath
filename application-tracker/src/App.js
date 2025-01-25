@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
+import StudentManagement from './pages/StudentManagement';
 
 const App = () => {
   return (
@@ -18,7 +19,8 @@ const App = () => {
 
             {/* Private Route */}
             <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
-            <Route path="/" element={<h1>Welcome to Application Tracker</h1>} />
+            <Route path="/students" element={<StudentManagement />} />
+            
           </Routes>
         </div>
         <Footer />

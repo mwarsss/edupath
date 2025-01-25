@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isStaff, setIsStaff] = useState(false);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -15,13 +12,8 @@ const Dashboard = () => {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://127.0.0.1:8000/api/applications/", {
           headers: { Authorization: `Bearer ${token}` },
-          params: {
-            search: search,
-            status: statusFilter,
-          },
         });
-        setApplications(response.data.applications || []);
-        setIsStaff(response.data.is_staff); // Assuming the backend sends `is_staff`
+        setApplications(response.data);
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch applications.");
@@ -30,21 +22,28 @@ const Dashboard = () => {
     };
 
     fetchApplications();
-  }, [search, statusFilter]);
+  }, []);
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (applicationId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.patch(`http://127.0.0.1:8000/api/applications/${id}/`, { status }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setApplications((prevApplications) =>
-        prevApplications.map((app) =>
-          app.id === id ? { ...app, status } : app
+      await axios.post(
+        `http://127.0.0.1:8000/api/applications/${applicationId}/update-status/`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the status in the frontend
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId ? { ...app, status: newStatus } : app
         )
       );
+      alert("Status updated successfully!");
     } catch (err) {
-      setError("Failed to update status.");
+      alert("Failed to update status.");
     }
   };
 
@@ -59,25 +58,6 @@ const Dashboard = () => {
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Dashboard</h2>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search applications"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="form-control mb-2"
-        />
-        <select
-          className="form-select"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      </div>
       <table className="table table-bordered">
         <thead>
           <tr>
@@ -88,37 +68,31 @@ const Dashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {applications.length > 0 ? (
-            applications.map((app) => (
-              <tr key={app.id}>
-                <td>{app.id}</td>
-                <td>{app.student.name}</td>
-                <td>
-                  {app.status}
-                  {isStaff && (
-                    <select
-                      className="form-select form-select-sm"
-                      onChange={(e) => updateStatus(app.id, e.target.value)}
-                    >
-                      <option disabled selected>
-                        Update Status
-                      </option>
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  )}
-                </td>
-                <td>
-                  <button className="btn btn-sm btn-primary">View</button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4">No applications found.</td>
+          {applications.map((app) => (
+            <tr key={app.id}>
+              <td>{app.id}</td>
+              <td>{app.student.name}</td>
+              <td>
+                {app.status}
+                {localStorage.getItem("user")?.role === "staff" && (
+                  <select
+                    className="form-select form-select-sm"
+                    onChange={(e) => updateStatus(app.id, e.target.value)}
+                  >
+                    <option disabled selected>
+                      Update Status
+                    </option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                )}
+              </td>
+              <td>
+                <button className="btn btn-sm btn-primary">View</button>
+              </td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
     </div>

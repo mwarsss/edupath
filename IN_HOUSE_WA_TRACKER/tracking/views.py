@@ -2,13 +2,14 @@ from rest_framework import viewsets, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Student, Staff, Application, Notification
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
+from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -115,3 +116,39 @@ class UpdateApplicationStatusView(APIView):
             return Response({"message": "Status updated successfully"}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Status is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+# get all students or search by name/email
+
+
+class StudentListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get("query", "")
+        if query:
+            students = Student.objects.filter(
+                models.Q(name__icontains=query) | models.Q(
+                    email__icontains=query)
+            )
+        else:
+            serializer = StudentSerializer(students, many=True)
+            return Response(serializer.data)
+
+# Update student information
+
+
+class UpdateStudentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, student_id):
+        try:
+            student = Student.objects.get(id=student_id)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = StudentSerializer(
+            student, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
