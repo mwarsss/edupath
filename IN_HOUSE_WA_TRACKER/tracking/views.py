@@ -1,3 +1,4 @@
+from .models import Student
 from rest_framework import viewsets, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Student, Staff, Application, Notification
 from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
+from django.db.models import Count
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -105,3 +107,38 @@ class UpdateStudentView(APIView):
         student.name = request.data.get('name')
         student.save()
         return Response({'status': 'student updated'}, status=HTTP_200_OK)
+
+
+class AnalyticsOverviewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Total number of students
+        total_students = Student.objects.count()
+
+        # Applications by status
+        applications_by_status = Student.objects.values(
+            "application_status").annotate(count=Count("application_status"))
+
+        # Applications per course
+        applications_by_course = Student.objects.values(
+            "course_applied").annotate(count=Count("course_applied"))
+
+        return Response({
+            "total_students": total_students,
+            "applications_by_status": applications_by_status,
+            "applications_by_course": applications_by_course,
+        })
+
+
+class ApplicationsOverTimeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Applications grouped by date (day level)
+        applications_over_time = (
+            Student.objects.extra({"day": "date(created_at)"}).values(
+                "day").annotate(count=Count("id")).order_by("day")
+        )
+
+        return Response({"applications_over_time": applications_over_time})

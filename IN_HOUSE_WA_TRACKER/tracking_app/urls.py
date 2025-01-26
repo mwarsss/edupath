@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from tracking.views import StudentViewSet, StaffViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView
+from tracking.views import StudentViewSet, StaffViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView, AnalyticsOverviewView, ApplicationsOverTimeView
 
 
 router = DefaultRouter()
@@ -40,4 +40,9 @@ urlpatterns = [
     path('api/students/', StudentListView.as_view(), name='students'),
     path('api/students/<int:pk>/update/',
          UpdateStudentView.as_view(), name='update-student'),
+    path('api/analytics/overview/', AnalyticsOverviewView.as_view(),
+         name='analytics-overview'),
+    path('api/analytics/applications-over-time/',
+         ApplicationsOverTimeView.as_view(), name='applications-over-time'),
+
 ]

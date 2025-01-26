@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import StudentManagement from './pages/StudentManagement';
+import Analytics from './pages/Analytics';
 
 const App = () => {
   return (
@@ -20,7 +21,7 @@ const App = () => {
             {/* Private Route */}
             <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
             <Route path="/students" element={<StudentManagement />} />
-            
+            <Route path="/analytics" element={<Analytics />} />
           </Routes>
         </div>
         <Footer />
