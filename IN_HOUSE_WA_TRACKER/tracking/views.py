@@ -2,15 +2,14 @@ from rest_framework import viewsets, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, status
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Student, Staff, Application, Notification
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
-from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
+from .models import Student, Staff, Application, Notification
+from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -27,8 +26,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['status']  # Add fields you want to filter by
-    # Add fields you want to search by
+    filterset_fields = ['status']
     search_fields = ['status', 'student__name']
 
 
@@ -62,15 +60,18 @@ class ApplicationListView(APIView):
     def get(self, request):
         applications = Application.objects.all()
         serializer = ApplicationSerializer(applications, many=True)
-        # Fetch applications based on user role
-        if request.user.is_staff:
-            applications = Application.objects.all()  # Staff sees all applications
-        else:
-            applications = Application.objects.filter(
-                student=request.user)  # Customers see their own
-        data = [{"id": app.id, "student": {"name": app.student.name},
-                 "status": app.status} for app in applications]
         return Response(serializer.data)
+
+
+class UpdateApplicationStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        application = Application.objects.get(pk=pk)
+        status = request.data.get('status')
+        application.status = status
+        application.save()
+        return Response({'status': 'status updated'}, status=HTTP_200_OK)
 
 
 class RegisterView(APIView):
@@ -79,76 +80,28 @@ class RegisterView(APIView):
         password = request.data.get('password')
         email = request.data.get('email')
 
-       # Validate input
-        if not username or not password or not email:
-            return Response({"error": "All fields are required."}, status=HTTP_400_BAD_REQUEST)
         if User.objects.filter(username=username).exists():
-            return Response({"error": "Username already exists."}, status=HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Username already exists'}, status=HTTP_400_BAD_REQUEST)
 
-        # Create new user
-        try:
-            user = User.objects.create_user(
-                username=username, password=password, email=email)
-            return Response({"message": "User registered successfully."}, status=HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
-
-
-class UpdateApplicationStatusView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, application_id):
-        # Ensure only staff can update statuses
-        if not request.user.is_staff:
-            return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
-
-        # Retrieve the application
-        try:
-            application = Application.objects.get(id=application_id)
-        except Application.DoesNotExist:
-            return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # Update the status
-        new_status = request.data.get("status")
-        if new_status:
-            application.status = new_status
-            application.save()
-            return Response({"message": "Status updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Status is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-# get all students or search by name/email
+        user = User.objects.create_user(
+            username=username, password=password, email=email)
+        return Response({'status': 'user created'}, status=HTTP_201_CREATED)
 
 
 class StudentListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        query = request.query_params.get("query", "")
-        if query:
-            students = Student.objects.filter(
-                models.Q(name__icontains=query) | models.Q(
-                    email__icontains=query)
-            )
-        else:
-            serializer = StudentSerializer(students, many=True)
-            return Response(serializer.data)
-
-# Update student information
+        students = Student.objects.all()
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
 
 
 class UpdateStudentView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request, student_id):
-        try:
-            student = Student.objects.get(id=student_id)
-        except Student.DoesNotExist:
-            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = StudentSerializer(
-            student, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, pk):
+        student = Student.objects.get(pk=pk)
+        student.name = request.data.get('name')
+        student.save()
+        return Response({'status': 'student updated'}, status=HTTP_200_OK)

@@ -33,12 +33,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/applications/', ApplicationListView.as_view(), name='applications'),
+    path('api/applications/<int:pk>/update-status/',
+         UpdateApplicationStatusView.as_view(), name='update-application-status'),
     path('api/login/', LoginView.as_view(), name='login'),
     path('api/register/', RegisterView.as_view(), name='register'),
-    path('api/applications/<int:application_id>/update-status/',
-         UpdateApplicationStatusView.as_view(), name='update-status'),
     path('api/students/', StudentListView.as_view(), name='students'),
-    path('api/students/<int:student_id>/update/',
+    path('api/students/<int:pk>/update/',
          UpdateStudentView.as_view(), name='update-student'),
-
 ]
