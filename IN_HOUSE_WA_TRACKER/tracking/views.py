@@ -9,8 +9,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Student, Staff, Application, Notification
-from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer, OnboardingSerializer
+from .models import Student, Application, Notification
+from .serializers import StudentSerializer, ApplicationSerializer, NotificationSerializer
 from django.db.models import Count
 from django.utils.dateparse import parse_date
 from django.contrib.auth.hashers import make_password
@@ -21,18 +21,9 @@ class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
 
 
-class StaffViewSet(viewsets.ModelViewSet):
-    queryset = Staff.objects.all()
-    serializer_class = StaffSerializer
-
-
 class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['status']
-    search_fields = ['status', 'student__name']
-    ordering_fields = ['status', 'student__name', 'created_at']
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

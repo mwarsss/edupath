@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from tracking.views import StudentViewSet, StaffViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView, AnalyticsOverviewView, ApplicationsOverTimeView, RegisterView, OnboardingView
+from tracking.views import StudentViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView, AnalyticsOverviewView, ApplicationsOverTimeView, OnboardingView  # Removed StaffViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -27,25 +27,23 @@ router = DefaultRouter()
 # Register the endpoints with their respective viewsets
 # Correct plural for endpoints
 router.register('students', StudentViewSet)
-router.register('staff', StaffViewSet)
 router.register('applications', ApplicationViewSet)
 router.register('notifications', NotificationViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/applications/', ApplicationListView.as_view(), name='applications'),
-    path('api/applications/<int:pk>/update-status/',
+    path('api/applications/list/',
+         ApplicationListView.as_view(), name='application-list'),
+    path('api/applications/update-status/',
          UpdateApplicationStatusView.as_view(), name='update-application-status'),
     path('api/login/', LoginView.as_view(), name='login'),
     path('api/register/', RegisterView.as_view(), name='register'),
-    path('api/students/', StudentListView.as_view(), name='students'),
-    path('api/students/<int:pk>/update/',
-         UpdateStudentView.as_view(), name='update-student'),
+    path('api/students/list/', StudentListView.as_view(), name='student-list'),
+    path('api/students/update/', UpdateStudentView.as_view(), name='update-student'),
     path('api/analytics/overview/', AnalyticsOverviewView.as_view(),
          name='analytics-overview'),
     path('api/analytics/applications-over-time/',
          ApplicationsOverTimeView.as_view(), name='applications-over-time'),
-    path('api/register/', RegisterView.as_view(), name='register'),
     path('api/onboarding/', OnboardingView.as_view(), name='onboarding'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

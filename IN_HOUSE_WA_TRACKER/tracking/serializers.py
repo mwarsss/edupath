@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, Staff, Application, Notification
+from .models import Student, Application, Notification
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -8,39 +8,19 @@ class StudentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class StaffSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Staff  # Corrected typo from 'models' to 'model'
-        fields = '__all__'
-
-
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Application  # Corrected typo from 'Staff' to 'Application'
-        fields = ['id', 'student', 'status',
-                  'document']  # Add 'document' field
+        model = Application
+        fields = '__all__'
 
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = ['id', 'title', 'message', 'created_at']
+        fields = '__all__'
 
 
 class OnboardingSerializer(serializers.ModelSerializer):
-    document = serializers.FileField(write_only=True)
-    submission_data = serializers.JSONField(write_only=True)  # Add this line
-
     class Meta:
-        model = Student
-        fields = ['name', 'email', 'phone', 'date_of_birth',
-                  'address', 'course_applied', 'document', 'submission_data']
-
-    def create(self, validated_data):
-        document = validated_data.pop('document', None)
-        submission_data = validated_data.pop(
-            'submission_data', None)  # Add this line
-        student = Student.objects.create(**validated_data)
-        Application.objects.create(
-            student=student, document=document, submission_data=submission_data)  # Add this line
-        return student
+        model = Student  # Assuming onboarding is related to the Student model
+        fields = '__all__'
