@@ -64,12 +64,20 @@ const Dashboard = () => {
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Dashboard</h2>
-      <button
-        className="btn btn-primary mb-4"
-        onClick={() => navigate('/students')}
-      >
-        View Students
-      </button>
+      <div className="d-flex justify-content-between mb-4">
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate('/students')}
+        >
+          View Students
+        </button>
+        <button
+          className="btn btn-success"
+          onClick={() => navigate('/onboarding')}
+        >
+          Add Applicant
+        </button>
+      </div>
       <div className="row mb-4">
         <div className="col-md-3 mb-2">
           <input

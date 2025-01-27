@@ -25,3 +25,18 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+
+
+class OnboardingSerializer(serializers.ModelSerializer):
+    document = serializers.FileField(write_only=True)
+
+    class Meta:
+        model = Student
+        fields = ['name', 'email', 'phone', 'date_of_birth',
+                  'address', 'course_applied', 'document']
+
+    def create(self, validated_data):
+        document = validated_data.pop('document', None)
+        student = Student.objects.create(**validated_data)
+        Application.objects.create(student=student, document=document)
+        return student

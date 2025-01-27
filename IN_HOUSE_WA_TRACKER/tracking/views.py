@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Student, Staff, Application, Notification
-from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer
+from .serializers import StudentSerializer, StaffSerializer, ApplicationSerializer, NotificationSerializer, OnboardingSerializer
 from django.db.models import Count
 from django.utils.dateparse import parse_date
 from django.contrib.auth.hashers import make_password
@@ -176,3 +176,12 @@ class ApplicationsOverTimeView(APIView):
             "day").annotate(count=Count("id")).order_by("day")
 
         return Response({"applications_over_time": applications_over_time})
+
+
+class OnboardingView(APIView):
+    def post(self, request):
+        serializer = OnboardingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status': 'Application submitted successfully!'}, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

@@ -27,22 +27,9 @@ class Staff(models.Model):
 
 
 class Application(models.Model):
-    STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('In progress', 'In Progress'),
-        ('Complete', 'Approved'),
-
-    ]
-
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default='Pending')
-    submission_data = models.DateTimeField(auto_now_add=True)
-    notes = models.TextField(blank=True, null=True)
-    assigned_staff = models.ForeignKey(
-        Staff, on_delete=models.SET_NULL, null=True, blank=True)
-    document = models.FileField(
-        upload_to='documents/', null=True, blank=True)  # Add this line
+    status = models.CharField(max_length=20, default="Pending")
+    document = models.FileField(upload_to='documents/', null=True, blank=True)
 
     def __str__(self):
         return f"Application {self.id} for {self.student.name}"
