@@ -70,6 +70,15 @@ const Login = () => {
                     Login
                 </button>
             </form>
+            <div className="text-center mt-3">
+                <p>Don't have an account?</p>
+                <button
+                    className="btn btn-secondary"
+                    onClick={() => navigate('/register')}
+                >
+                    Register
+                </button>
+            </div>
         </div>
     );
 };

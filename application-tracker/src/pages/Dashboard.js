@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isStaff, setIsStaff] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -12,8 +19,14 @@ const Dashboard = () => {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://127.0.0.1:8000/api/applications/", {
           headers: { Authorization: `Bearer ${token}` },
+          params: {
+            status: statusFilter,
+            search: searchQuery,
+            ordering: sortField ? `${sortOrder === "asc" ? "" : "-"}${sortField}` : "",
+          },
         });
-        setApplications(response.data);
+        setApplications(response.data.applications || []);
+        setIsStaff(response.data.is_staff); // Assuming the backend sends `is_staff`
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch applications.");
@@ -22,28 +35,21 @@ const Dashboard = () => {
     };
 
     fetchApplications();
-  }, []);
+  }, [statusFilter, searchQuery, sortField, sortOrder]);
 
-  const updateStatus = async (applicationId, newStatus) => {
+  const updateStatus = async (id, status) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `http://127.0.0.1:8000/api/applications/${applicationId}/update-status/`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      // Update the status in the frontend
-      setApplications((prev) =>
-        prev.map((app) =>
-          app.id === applicationId ? { ...app, status: newStatus } : app
+      await axios.patch(`http://127.0.0.1:8000/api/applications/${id}/`, { status }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setApplications((prevApplications) =>
+        prevApplications.map((app) =>
+          app.id === id ? { ...app, status } : app
         )
       );
-      alert("Status updated successfully!");
     } catch (err) {
-      alert("Failed to update status.");
+      setError("Failed to update status.");
     }
   };
 
@@ -58,6 +64,49 @@ const Dashboard = () => {
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Dashboard</h2>
+      <button
+        className="btn btn-primary mb-4"
+        onClick={() => navigate('/students')}
+      >
+        View Students
+      </button>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search applications"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="form-control mb-2"
+        />
+        <select
+          className="form-select mb-2"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+        <select
+          className="form-select mb-2"
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+        >
+          <option value="">Sort By</option>
+          <option value="status">Status</option>
+          <option value="student__name">Student Name</option>
+          <option value="created_at">Created At</option>
+        </select>
+        <select
+          className="form-select mb-2"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
       <table className="table table-bordered">
         <thead>
           <tr>
@@ -68,31 +117,39 @@ const Dashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {applications.map((app) => (
-            <tr key={app.id}>
-              <td>{app.id}</td>
-              <td>{app.student.name}</td>
-              <td>
-                {app.status}
-                {localStorage.getItem("user")?.role === "staff" && (
-                  <select
-                    className="form-select form-select-sm"
-                    onChange={(e) => updateStatus(app.id, e.target.value)}
-                  >
-                    <option disabled selected>
-                      Update Status
-                    </option>
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
-                )}
-              </td>
-              <td>
-                <button className="btn btn-sm btn-primary">View</button>
+          {applications && applications.length > 0 ? (
+            applications.map((app) => (
+              <tr key={app.id}>
+                <td>{app.id}</td>
+                <td>{app.student.name}</td>
+                <td>
+                  {app.status}
+                  {isStaff && (
+                    <select
+                      className="form-select form-select-sm"
+                      onChange={(e) => updateStatus(app.id, e.target.value)}
+                    >
+                      <option disabled selected>
+                        Update Status
+                      </option>
+                      <option value="Pending">Pending</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  )}
+                </td>
+                <td>
+                  <button className="btn btn-sm btn-primary">View</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="text-center">
+                No applications found.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
