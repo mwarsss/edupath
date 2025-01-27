@@ -36,22 +36,9 @@ class Application(models.Model):
 
 
 class Notification(models.Model):
-    NOTIFICATION_TYPES = [
-        ('email', 'Email'),
-        ('whatsapp', 'WhatsApp'),
-    ]
-
-    notification_type = models.CharField(
-        max_length=20, choices=NOTIFICATION_TYPES, default='email')
+    title = models.CharField(max_length=100)
     message = models.TextField()
-    application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if self.notification_type.lower() == "whatsapp":
-            # Add your logic here
-            pass
-        super().save(*args, **kwargs)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Notification for {self.application.id}"
+        return self.title
