@@ -41,9 +41,11 @@ class Application(models.Model):
     notes = models.TextField(blank=True, null=True)
     assigned_staff = models.ForeignKey(
         Staff, on_delete=models.SET_NULL, null=True, blank=True)
+    document = models.FileField(
+        upload_to='documents/', null=True, blank=True)  # Add this line
 
     def __str__(self):
-        return f"{self.student.name} - {self.status}"
+        return f"Application {self.id} for {self.student.name}"
 
 
 class Notification(models.Model):

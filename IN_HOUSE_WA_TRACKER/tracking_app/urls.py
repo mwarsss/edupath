@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from tracking.views import StudentViewSet, StaffViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView, AnalyticsOverviewView, ApplicationsOverTimeView, RegisterView
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 router = DefaultRouter()
@@ -45,4 +47,4 @@ urlpatterns = [
     path('api/analytics/applications-over-time/',
          ApplicationsOverTimeView.as_view(), name='applications-over-time'),
     path('api/register/', RegisterView.as_view(), name='register')
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -17,7 +17,8 @@ class StaffSerializer(serializers.ModelSerializer):
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application  # Corrected typo from 'Staff' to 'Application'
-        fields = '__all__'
+        fields = ['id', 'student', 'status',
+                  'document']  # Add 'document' field
 
 
 class NotificationSerializer(serializers.ModelSerializer):

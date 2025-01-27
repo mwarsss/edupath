@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import StudentManagement from './pages/StudentManagement';
 import Analytics from './pages/Analytics';
+import Onboarding from './pages/Onboarding'; // Import the Onboarding component
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} /> {/* Add the Register route */}
+            <Route path="/onboarding" element={<Onboarding />} /> {/* Add the Onboarding route */}
 
             {/* Private Routes */}
             <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />

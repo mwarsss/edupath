@@ -29,9 +29,8 @@ class StaffViewSet(viewsets.ModelViewSet):
 class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
-    filter_backends = [DjangoFilterBackend,
-                       filters.OrderingFilter, filters.SearchFilter]
-    filterset_fields = ['status', 'student__name']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['status']
     search_fields = ['status', 'student__name']
     ordering_fields = ['status', 'student__name', 'created_at']
 

@@ -70,42 +70,50 @@ const Dashboard = () => {
       >
         View Students
       </button>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search applications"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="form-control mb-2"
-        />
-        <select
-          className="form-select mb-2"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-        <select
-          className="form-select mb-2"
-          value={sortField}
-          onChange={(e) => setSortField(e.target.value)}
-        >
-          <option value="">Sort By</option>
-          <option value="status">Status</option>
-          <option value="student__name">Student Name</option>
-          <option value="created_at">Created At</option>
-        </select>
-        <select
-          className="form-select mb-2"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
+      <div className="row mb-4">
+        <div className="col-md-3 mb-2">
+          <input
+            type="text"
+            placeholder="Search applications"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="form-control"
+          />
+        </div>
+        <div className="col-md-3 mb-2">
+          <select
+            className="form-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <div className="col-md-3 mb-2">
+          <select
+            className="form-select"
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value)}
+          >
+            <option value="">Sort By</option>
+            <option value="status">Status</option>
+            <option value="student__name">Student Name</option>
+            <option value="created_at">Created At</option>
+          </select>
+        </div>
+        <div className="col-md-3 mb-2">
+          <select
+            className="form-select"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
       </div>
       <table className="table table-bordered">
         <thead>
