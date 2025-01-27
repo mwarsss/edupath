@@ -30,13 +30,15 @@ class Application(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, default="Pending")
     document = models.FileField(upload_to='documents/', null=True, blank=True)
+    submission_data = models.JSONField(null=True, blank=True)  # Add this line
 
     def __str__(self):
         return f"Application {self.id} for {self.student.name}"
 
 
 class Notification(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(
+        max_length=100, default="Untitled Notification")  # Add default value
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

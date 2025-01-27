@@ -25,6 +25,7 @@ const Onboarding = () => {
     formData.append('address', address);
     formData.append('course_applied', courseApplied);
     formData.append('document', document);
+    formData.append('submission_data', JSON.stringify({ name, email, phone, dateOfBirth, address, courseApplied }));  // Add this line
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/applications/', formData, {

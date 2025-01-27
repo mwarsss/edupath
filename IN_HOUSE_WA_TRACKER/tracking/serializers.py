@@ -29,14 +29,18 @@ class NotificationSerializer(serializers.ModelSerializer):
 
 class OnboardingSerializer(serializers.ModelSerializer):
     document = serializers.FileField(write_only=True)
+    submission_data = serializers.JSONField(write_only=True)  # Add this line
 
     class Meta:
         model = Student
         fields = ['name', 'email', 'phone', 'date_of_birth',
-                  'address', 'course_applied', 'document']
+                  'address', 'course_applied', 'document', 'submission_data']
 
     def create(self, validated_data):
         document = validated_data.pop('document', None)
+        submission_data = validated_data.pop(
+            'submission_data', None)  # Add this line
         student = Student.objects.create(**validated_data)
-        Application.objects.create(student=student, document=document)
+        Application.objects.create(
+            student=student, document=document, submission_data=submission_data)  # Add this line
         return student
