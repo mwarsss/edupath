@@ -1,0 +1,30 @@
+[
+    {
+        "model": "tracking.student",
+        "pk": 1,
+        "fields": {
+            "name": "John Doe",
+            "email": "john.doe@example.com",
+            "phone": "1234567890",
+            "date_of_birth": "2000-05-14",
+            "address": "123 Fake Street",
+            "course_applied": "Engineering",
+            "application_status": "Pending",
+            "created_at": "2023-11-15T14:30:00Z"
+        }
+    },
+    {
+        "model": "tracking.student",
+        "pk": 2,
+        "fields": {
+            "name": "Jane Smith",
+            "email": "jane.smith@example.com",
+            "phone": "9876543210",
+            "date_of_birth": "1998-02-10",
+            "address": "456 Elm Street",
+            "course_applied": "Medicine",
+            "application_status": "Approved",
+            "created_at": "2023-11-16T10:00:00Z"
+        }
+    }
+]
