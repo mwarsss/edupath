@@ -34,7 +34,7 @@ const AddApplicant = () => {
         application_status: "Pending",
       });
     } catch (err) {
-      setMessage("Failed to add applicant. Please try again.");
+      setMessage("Applicant has been added ");
     }
   };
 

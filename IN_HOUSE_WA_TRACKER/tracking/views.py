@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import authenticate
@@ -170,21 +171,24 @@ class ApplicationsOverTimeView(APIView):
         return Response({"applications_over_time": applications_over_time})
 
 
-class OnboardingView(APIView):
-    def post(self, request):
-        serializer = OnboardingSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': 'Application submitted successfully!'}, status=HTTP_201_CREATED)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-
-class AddApplicantView(APIView):
-    permission_classes = [IsAuthenticated]
+class BaseCreateView(APIView):
+    serializer_class = None
+    success_message = "Operation successful!"
 
     def post(self, request):
-        serializer = StudentSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Applicant added successfully!", "data": serializer.data}, status=status.HTTP_201_CREATED)
+            return Response({"message": self.success_message, "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class OnboardingView(BaseCreateView):
+    serializer_class = OnboardingSerializer
+    success_message = "Application submitted successfully!"
+
+
+class AddApplicantView(BaseCreateView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = StudentSerializer
+    success_message = "Applicant added successfully!"

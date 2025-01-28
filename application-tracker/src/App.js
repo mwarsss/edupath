@@ -11,7 +11,9 @@ import Analytics from './pages/Analytics';
 import Onboarding from './pages/Onboarding';
 import Notifications from './pages/Notifications'; 
 import AddApplicant from './pages/AddApplicant';
+import UpdateStudent from './pages/UpdateStudent';
 import Unauthorized from './pages/Unauthorized';
+import StaffDashboard from './pages/StaffDashboard';
 
 const App = () => {
   return (
@@ -32,6 +34,8 @@ const App = () => {
             <Route path="/analytics" element={<PrivateRoute component={Analytics} />} />
             <Route path="/notifications" element={<PrivateRoute component={Notifications} />} />
             <Route path="/add-applicant" element={<PrivateRoute component={AddApplicant} />} />
+            <Route path='/staff-dashboard' element={<PrivateRoute component={StaffDashboard} />} />
+            <Route path="/students/update" element={<PrivateRoute component={UpdateStudent} />} />
           </Routes>
         </div>
         <Footer />
