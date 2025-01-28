@@ -1,5 +1,4 @@
 from django.db import models
-from .utils import send_whatsapp_message
 
 
 class Student(models.Model):

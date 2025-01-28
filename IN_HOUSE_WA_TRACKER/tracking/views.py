@@ -10,13 +10,14 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Student, Application, Notification
-from .serializers import StudentSerializer, ApplicationSerializer, NotificationSerializer
+from .serializers import StudentSerializer, ApplicationSerializer, NotificationSerializer, OnboardingSerializer
 from django.db.models import Count
 from django.utils.dateparse import parse_date
 from django.contrib.auth.hashers import make_password
 
 
 class StudentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
@@ -176,3 +177,14 @@ class OnboardingView(APIView):
             serializer.save()
             return Response({'status': 'Application submitted successfully!'}, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class AddApplicantView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Applicant added successfully!", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

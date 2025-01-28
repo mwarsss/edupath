@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Student, Application, Notification  # Removed Staff
+from .models import Student, Application, Notification
 
 # Register your models here.
 admin.site.register(Student)

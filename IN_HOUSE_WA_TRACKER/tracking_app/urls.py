@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from tracking.views import StudentViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView, AnalyticsOverviewView, ApplicationsOverTimeView, OnboardingView  # Removed StaffViewSet
+from tracking.views import StudentViewSet, ApplicationViewSet, NotificationViewSet, LoginView, ApplicationListView, UpdateApplicationStatusView, RegisterView, StudentListView, UpdateStudentView, AnalyticsOverviewView, ApplicationsOverTimeView, OnboardingView, AddApplicantView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -46,4 +46,5 @@ urlpatterns = [
     path('api/analytics/applications-over-time/',
          ApplicationsOverTimeView.as_view(), name='applications-over-time'),
     path('api/onboarding/', OnboardingView.as_view(), name='onboarding'),
+    path('api/applicants/add/', AddApplicantView.as_view(), name='add-applicant'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

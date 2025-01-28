@@ -9,7 +9,9 @@ import PrivateRoute from './components/PrivateRoute';
 import StudentManagement from './pages/StudentManagement';
 import Analytics from './pages/Analytics';
 import Onboarding from './pages/Onboarding';
-import Notifications from './pages/Notifications'; // Import the Notifications component
+import Notifications from './pages/Notifications'; 
+import AddApplicant from './pages/AddApplicant';
+import Unauthorized from './pages/Unauthorized';
 
 const App = () => {
   return (
@@ -22,12 +24,14 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* Private Routes */}
             <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
             <Route path="/students" element={<PrivateRoute component={StudentManagement} />} />
             <Route path="/analytics" element={<PrivateRoute component={Analytics} />} />
-            <Route path="/notifications" element={<PrivateRoute component={Notifications} />} /> {/* Add the Notifications route */}
+            <Route path="/notifications" element={<PrivateRoute component={Notifications} />} />
+            <Route path="/add-applicant" element={<PrivateRoute component={AddApplicant} />} />
           </Routes>
         </div>
         <Footer />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 const Dashboard = () => {
@@ -71,12 +71,9 @@ const Dashboard = () => {
         >
           View Students
         </button>
-        <button
-          className="btn btn-success"
-          onClick={() => navigate('/onboarding')}
-        >
-          Add Applicant
-        </button>
+        <Link to="/add-applicant" className="btn btn-primary">
+          Add Applications
+        </Link>
       </div>
       <div className="row mb-4">
         <div className="col-md-3 mb-2">
