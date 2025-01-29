@@ -36,13 +36,17 @@ const Notifications = () => {
     <div className="container mt-4">
       <h2 className="mb-4">Notifications</h2>
       <ul className="list-group">
-        {notifications.map((notification) => (
-          <li key={notification.id} className="list-group-item">
-            <h5>{notification.title}</h5>
-            <p>{notification.message}</p>
-            <small className="text-muted">{new Date(notification.created_at).toLocaleString()}</small>
-          </li>
-        ))}
+        {notifications.length === 0 ? (
+          <li className="list-group-item">No notifications available.</li>
+        ) : (
+          notifications.map((notification) => (
+            <li key={notification.id} className="list-group-item">
+              <h5>{notification.title}</h5>
+              <p>{notification.message}</p>
+              <small className="text-muted">{new Date(notification.created_at).toLocaleString()}</small>
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );

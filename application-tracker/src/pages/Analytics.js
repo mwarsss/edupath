@@ -101,6 +101,13 @@ const Analytics = () => {
           />
         </div>
       </div>
+
+      <div>
+        <h1>Analytics</h1>
+        <p>Number of users: 100</p>
+        <p>Number of active sessions: 50</p>
+        <p>Average session duration: 5 minutes</p>
+      </div>
     </div>
   );
 };

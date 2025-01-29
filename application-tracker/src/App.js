@@ -14,6 +14,7 @@ import AddApplicant from './pages/AddApplicant';
 import UpdateStudent from './pages/UpdateStudent';
 import Unauthorized from './pages/Unauthorized';
 import StaffDashboard from './pages/StaffDashboard';
+import { AddApplication } from './pages/AddApplication';
 
 const App = () => {
   return (
@@ -35,7 +36,8 @@ const App = () => {
             <Route path="/notifications" element={<PrivateRoute component={Notifications} />} />
             <Route path="/add-applicant" element={<PrivateRoute component={AddApplicant} />} />
             <Route path='/staff-dashboard' element={<PrivateRoute component={StaffDashboard} />} />
-            <Route path="/students/update" element={<PrivateRoute component={UpdateStudent} />} />
+            <Route path="/students/update/:id" element={<PrivateRoute component={UpdateStudent} />} />
+            <Route path="/add-application" element={<PrivateRoute component={AddApplication} />} />
           </Routes>
         </div>
         <Footer />

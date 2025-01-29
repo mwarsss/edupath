@@ -15,6 +15,7 @@ from .serializers import StudentSerializer, ApplicationSerializer, NotificationS
 from django.db.models import Count
 from django.utils.dateparse import parse_date
 from django.contrib.auth.hashers import make_password
+from django.shortcuts import render
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -26,6 +27,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
@@ -192,3 +194,7 @@ class AddApplicantView(BaseCreateView):
     permission_classes = [IsAuthenticated]
     serializer_class = StudentSerializer
     success_message = "Applicant added successfully!"
+
+
+def analytics_view(request):
+    return render(request, 'analytics.html')

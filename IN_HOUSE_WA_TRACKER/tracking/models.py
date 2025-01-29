@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Student(models.Model):
@@ -21,6 +22,7 @@ class Application(models.Model):
     status = models.CharField(max_length=20, default="Pending")
     document = models.FileField(upload_to='documents/', null=True, blank=True)
     submission_data = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Application {self.id} for {self.student.name}"

@@ -10,7 +10,6 @@ const Onboarding = () => {
   const [courseApplied, setCourseApplied] = useState('');
   const [document, setDocument] = useState(null);
   const [status, setStatus] = useState('Pending');
-  const [submissionData, setSubmissionData] = useState({});
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
@@ -48,7 +47,6 @@ const Onboarding = () => {
         setCourseApplied('');
         setDocument(null);
         setStatus('Pending');
-        setSubmissionData({});
       }
     } catch (err) {
       setError('Failed to update application. Please try again.');
