@@ -2,7 +2,7 @@ from .models import Student
 from rest_framework import viewsets, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -165,7 +165,7 @@ class ApplicationsOverTimeView(APIView):
                 created_at__date__gte=parse_date(start_date))
         if end_date:
             applications_over_time = applications_over_time.filter(
-                created_at__date__lte=parse_date(end_date))
+                created_at__lte=parse_date(end_date))
 
         applications_over_time = applications_over_time.values(
             "day").annotate(count=Count("id")).order_by("day")
@@ -194,6 +194,27 @@ class AddApplicantView(BaseCreateView):
     permission_classes = [IsAuthenticated]
     serializer_class = StudentSerializer
     success_message = "Applicant added successfully!"
+
+
+class AddStaffView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        name = request.data.get('name')
+        role = request.data.get('role')
+        email = request.data.get('email')
+        contact = request.data.get('contact')
+
+        if User.objects.filter(email=email).exists():
+            return Response({'error': 'Email already exists'}, status=HTTP_400_BAD_REQUEST)
+
+        staff = Staff.objects.create(
+            name=name,
+            role=role,
+            email=email,
+            contact=contact
+        )
+        return Response({'status': 'Staff added successfully'}, status=HTTP_201_CREATED)
 
 
 def analytics_view(request):
