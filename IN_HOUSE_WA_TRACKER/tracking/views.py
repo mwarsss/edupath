@@ -217,5 +217,27 @@ class AddStaffView(APIView):
         return Response({'status': 'Staff added successfully'}, status=HTTP_201_CREATED)
 
 
+class UpdateStaffView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request, pk):
+        staff = Staff.objects.get(pk=pk)
+        staff.name = request.data.get('name', staff.name)
+        staff.role = request.data.get('role', staff.role)
+        staff.email = request.data.get('email', staff.email)
+        staff.contact = request.data.get('contact', staff.contact)
+        staff.save()
+        return Response({'status': 'Staff updated successfully'}, status=HTTP_200_OK)
+
+
+class DeleteStaffView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def delete(self, request, pk):
+        staff = Staff.objects.get(pk=pk)
+        staff.delete()
+        return Response({'status': 'Staff deleted successfully'}, status=HTTP_200_OK)
+
+
 def analytics_view(request):
     return render(request, 'analytics.html')
