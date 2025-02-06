@@ -14,7 +14,7 @@ import AddApplicant from './pages/AddApplicant';
 import UpdateStudent from './pages/UpdateStudent';
 import Unauthorized from './pages/Unauthorized';
 import StaffDashboard from './pages/StaffDashboard';
-import { AddApplication } from './pages/AddApplication';
+import AddApplication from './pages/AddApplication';
 
 const App = () => {
   return (
@@ -47,3 +47,4 @@ const App = () => {
 };
 
 export default App;
+

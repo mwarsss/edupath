@@ -3,145 +3,114 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AddApplicant = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    address: '',
-    course_applied: '',
-    program: '',
-    application_status: 'Pending',
-  });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [address, setAddress] = useState('');
+  const [courseApplied, setCourseApplied] = useState('');
+  const [program, setProgram] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError('No token found. Please log in.');
-      return;
-    }
-
     try {
-      await axios.post('http://127.0.0.1:8000/api/students/', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://127.0.0.1:8000/api/applicants/add/', {
+        name,
+        email,
+        phone,
+        date_of_birth: dateOfBirth,
+        address,
+        course_applied: courseApplied,
+        program,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      setMessage(response.data.message);
+      setError('');
       navigate('/dashboard');
     } catch (err) {
       setError('Failed to add applicant.');
+      setMessage('');
     }
   };
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Add Applicant</h2>
-      {error && <p className="text-danger">{error}</p>}
+      {message && <div className="alert alert-success">{message}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Name</label>
+        <div className="mb-3">
+          <label className="form-label">Name</label>
           <input
             type="text"
             className="form-control"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label>Email</label>
+        <div className="mb-3">
+          <label className="form-label">Email</label>
           <input
             type="email"
             className="form-control"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label>Phone</label>
+        <div className="mb-3">
+          <label className="form-label">Phone</label>
           <input
             type="text"
             className="form-control"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label>Date of Birth</label>
+        <div className="mb-3">
+          <label className="form-label">Date of Birth</label>
           <input
             type="date"
             className="form-control"
-            name="date_of_birth"
-            value={formData.date_of_birth}
-            onChange={handleChange}
-            required
+            value={dateOfBirth}
+            onChange={(e) => setDateOfBirth(e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label>Address</label>
+        <div className="mb-3">
+          <label className="form-label">Address</label>
           <textarea
             className="form-control"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            required
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
           ></textarea>
         </div>
-        <div className="form-group">
-          <label>Course Applied</label>
+        <div className="mb-3">
+          <label className="form-label">Course Applied</label>
           <input
             type="text"
             className="form-control"
-            name="course_applied"
-            value={formData.course_applied}
-            onChange={handleChange}
+            value={courseApplied}
+            onChange={(e) => setCourseApplied(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label>Program</label>
+        <div className="mb-3">
+          <label className="form-label">Program</label>
           <input
             type="text"
             className="form-control"
-            name="program"
-            value={formData.program}
-            onChange={handleChange}
-            required
+            value={program}
+            onChange={(e) => setProgram(e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label>Application Status</label>
-          <select
-            className="form-control"
-            name="application_status"
-            value={formData.application_status}
-            onChange={handleChange}
-            required
-          >
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Submit
-        </button>
+        <button type="submit" className="btn btn-primary">Add Applicant</button>
       </form>
     </div>
   );
