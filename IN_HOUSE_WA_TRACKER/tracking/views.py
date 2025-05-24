@@ -13,6 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Student, Application, Notification
 from .serializers import StudentSerializer, ApplicationSerializer, NotificationSerializer, OnboardingSerializer
 from django.db.models import Count
+from django.db.models.functions import TruncDay # Import TruncDay
 from django.utils.dateparse import parse_date
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
@@ -36,6 +37,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
 
 class LoginView(TokenObtainPairView):
+    """
+    Handles user authentication using username and password,
+    and provides JWT tokens (access and refresh) upon successful login.
+    Extends TokenObtainPairView from rest_framework_simplejwt.
+    """
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -55,6 +61,10 @@ class LoginView(TokenObtainPairView):
 
 
 class ApplicationListView(APIView):
+    """
+    Provides a list of all applications.
+    Requires authentication.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -64,17 +74,34 @@ class ApplicationListView(APIView):
 
 
 class UpdateApplicationStatusView(APIView):
+    """
+    Updates the status of a specific application, identified by its primary key (pk).
+    Requires authentication.
+    Expects 'status' in the request data.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        application = Application.objects.get(pk=pk)
-        status = request.data.get('status')
-        application.status = status
-        application.save()
-        return Response({'status': 'status updated'}, status=HTTP_200_OK)
+        try:
+            application = Application.objects.get(pk=pk)
+        except Application.DoesNotExist:
+            return Response({'error': 'Application not found'}, status=HTTP_404_NOT_FOUND)
+        
+        status_param = request.data.get('status') # Renamed to avoid conflict with 'status' module
+        if status_param is not None: # Check if status is provided
+            application.status = status_param
+            application.save()
+            return Response({'status': 'status updated'}, status=HTTP_200_OK)
+        else:
+            return Response({'error': 'Status not provided'}, status=HTTP_400_BAD_REQUEST)
 
 
 class RegisterView(APIView):
+    """
+    Handles new user registration.
+    Expects 'username', 'password', and 'email' in the request data.
+    Checks for existing username or email before creating a new user.
+    """
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -95,6 +122,10 @@ class RegisterView(APIView):
 
 
 class StudentListView(APIView):
+    """
+    Provides a list of all students.
+    Requires authentication.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -104,37 +135,62 @@ class StudentListView(APIView):
 
 
 class UpdateStudentView(APIView):
+    """
+    Updates the details (specifically the name) of a student, identified by their primary key (pk).
+    Requires authentication.
+    Expects 'name' in the request data.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        student = Student.objects.get(pk=pk)
-        student.name = request.data.get('name')
-        student.save()
-        return Response({'status': 'student updated'}, status=HTTP_200_OK)
+        try:
+            student = Student.objects.get(pk=pk)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=HTTP_404_NOT_FOUND)
+        
+        name_param = request.data.get('name') # Renamed to avoid conflict
+        if name_param is not None: # Check if name is provided
+            student.name = name_param
+            student.save()
+            return Response({'status': 'student updated'}, status=HTTP_200_OK)
+        else:
+            return Response({'error': 'Name not provided'}, status=HTTP_400_BAD_REQUEST)
 
 
 class AnalyticsOverviewView(APIView):
+    """
+    Provides an overview of application analytics.
+    Supports filtering by start_date, end_date, course, and status.
+    Returns total student count, and counts of applications grouped by status and course.
+    Requires authentication.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Get filter parameters
-        start_date = request.query_params.get("start_date")
-        end_date = request.query_params.get("end_date")
+        # Get filter parameters from query
+        start_date_str = request.query_params.get("start_date")
+        end_date_str = request.query_params.get("end_date")
         course = request.query_params.get("course")
-        status = request.query_params.get("status")
+        status_param = request.query_params.get("status")
 
-        # Filter students based on parameters
-        students = Student.objects.all()
-        if start_date:
-            students = students.filter(
-                created_at__date__gte=parse_date(start_date))
-        if end_date:
-            students = students.filter(
-                created_at__date__lte=parse_date(end_date))
+        # Dynamically build filter conditions
+        filters = {}
+        if start_date_str:
+            parsed_start_date = parse_date(start_date_str)
+            if parsed_start_date:
+                filters['created_at__date__gte'] = parsed_start_date
+        if end_date_str:
+            parsed_end_date = parse_date(end_date_str)
+            if parsed_end_date:
+                filters['created_at__date__lte'] = parsed_end_date
         if course:
-            students = students.filter(course_applied=course)
-        if status:
-            students = students.filter(application_status=status)
+            filters['course_applied'] = course
+        if status_param: # Renamed to avoid conflict with 'status' module
+            filters['application_status'] = status_param
+
+        # Filter students based on dynamically built conditions
+        # The **filters syntax unpacks the dictionary into keyword arguments
+        students = Student.objects.filter(**filters)
 
         # Analytics calculations
         total_students = students.count()
@@ -151,29 +207,51 @@ class AnalyticsOverviewView(APIView):
 
 
 class ApplicationsOverTimeView(APIView):
+    """
+    Provides data on the number of student applications received over time.
+    Supports filtering by start_date and end_date.
+    Groups application counts by day.
+    Requires authentication.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        start_date = request.query_params.get("start_date")
-        end_date = request.query_params.get("end_date")
+        start_date_str = request.query_params.get("start_date")
+        end_date_str = request.query_params.get("end_date")
 
-        # Filter by date range
-        applications_over_time = Student.objects.extra(
-            {"day": "date(created_at)"})
-        if start_date:
-            applications_over_time = applications_over_time.filter(
-                created_at__date__gte=parse_date(start_date))
-        if end_date:
-            applications_over_time = applications_over_time.filter(
-                created_at__date__lte=parse_date(end_date))
+        # Start with the base queryset
+        queryset = Student.objects.all()
 
-        applications_over_time = applications_over_time.values(
-            "day").annotate(count=Count("id")).order_by("day")
+        # Apply date filters if provided
+        if start_date_str:
+            parsed_start_date = parse_date(start_date_str)
+            if parsed_start_date:
+                queryset = queryset.filter(created_at__date__gte=parsed_start_date)
+        if end_date_str:
+            parsed_end_date = parse_date(end_date_str)
+            if parsed_end_date:
+                queryset = queryset.filter(created_at__date__lte=parsed_end_date)
+
+        # Annotate with 'day' by truncating 'created_at', then group and count
+        # This approach is database-agnostic for date truncation.
+        applications_over_time = queryset.annotate(
+            day=TruncDay('created_at')  # Truncate the datetime to a date (day)
+        ).values(
+            'day'  # Group by the truncated day
+        ).annotate(
+            count=Count('id')  # Count applications per day
+        ).order_by(
+            'day'  # Order results by day
+        )
 
         return Response({"applications_over_time": applications_over_time})
 
 
 class BaseCreateView(APIView):
+    """
+    A base class for API views that handle creation of new model instances.
+    Subclasses should specify `serializer_class` and `success_message`.
+    """
     serializer_class = None
     success_message = "Operation successful!"
 
@@ -186,11 +264,22 @@ class BaseCreateView(APIView):
 
 
 class OnboardingView(BaseCreateView):
+    """
+    Handles the submission of new applications (onboarding).
+    Uses OnboardingSerializer to validate and save application data.
+    Inherits from BaseCreateView.
+    """
     serializer_class = OnboardingSerializer
     success_message = "Application submitted successfully!"
 
 
 class AddApplicantView(BaseCreateView):
+    """
+    Handles the addition of new student applicants.
+    Requires authentication.
+    Uses StudentSerializer to validate and save student data.
+    Inherits from BaseCreateView.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = StudentSerializer
     success_message = "Applicant added successfully!"
